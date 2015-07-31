@@ -1,0 +1,28 @@
+This repository contains the following files:
+
+.vimrc, the author's vimrc file.
+
+        This file is heavily commented. I guess the most "interesting" part is
+        the affectation of the backupdir and directory options (the
+        directories where the backup files and the swap files are written
+        respectively). The file creates and uses the directories ~/.vim/backup
+        and ~/.vim/swap.
+
+
+.gtkrc-2.0, the author's configuration file for GTK.
+
+        Thanks to this file, there is no unpleasant white patch at the bottom
+        of the gVim window when gVim is used with a window manager that does
+        not respect the size hints (e.g. tiling window managers).
+
+
+install_thierr26_vim-gtk_config, a shell script to install the files.
+
+        This script copies .vimrc and .gtkrc-2.0 to the user's home directory
+        or to the directory specified on the command line. Launch the script
+        with the --help option for a complete documentation.
+
+
+README, the present file.
+
+LICENSE, the license file (Unlicense license).

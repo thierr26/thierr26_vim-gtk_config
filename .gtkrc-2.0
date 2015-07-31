@@ -1,0 +1,10 @@
+# Define a style with the widget background color matching the background
+# color of the Vim color scheme.
+style "vim_bg" {
+    bg[NORMAL] = "#202020"
+}
+
+# Apply the style to the Vim window, to avoid an unpleasant white patch at the
+# bottom of the gVim window when used with a window manager that does not
+# respect the size hints (e.g. tiling window managers).
+widget "vim-main-window.*GtkForm" style "vim_bg"
