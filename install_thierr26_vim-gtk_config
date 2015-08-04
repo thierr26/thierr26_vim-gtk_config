@@ -78,6 +78,8 @@ documentation() {
 Usage:
 
     $SCRIPT_NAME [-f|--force] [DEST]
+EOF
+    $CMD <<EOF
     $SCRIPT_NAME -h|--help
 
 Description:
