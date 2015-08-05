@@ -13,7 +13,7 @@ This repository contains the following files:
 
         Thanks to this file, there is no unpleasant white patch at the bottom
         of the gVim window when gVim is used with a window manager that does
-        not respect the size hints (e.g. tiling window managers).
+        not respect the size hints (e.g. a tiling window manager).
 
 
 install_thierr26_vim-gtk_config, a shell script to install the files.
