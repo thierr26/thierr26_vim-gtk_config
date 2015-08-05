@@ -251,8 +251,10 @@ is_not_a_dir() {
 # ARGUMENT
 # $1: A file or directory name.
 is_not_read_only() {
-    if ! [ -w "$1" ]; then
-        fatal "$1 already exists as a read only file or directory.";
+    if [ -f "$1" ]; then
+        if ! [ -w "$1" ]; then
+            fatal "$1 already exists as a read only file or directory.";
+        fi;
     fi;
 }
 
@@ -315,8 +317,8 @@ else
             && is_not_read_only "$DEST/$F2_BASE_NAME" \
             && overwrite_not_forbidden $FORCE_OPT "$DEST/$F1_BASE_NAME" \
             && overwrite_not_forbidden $FORCE_OPT "$DEST/$F2_BASE_NAME"; then
-        "$CP" "$F1" $DEST;
-        "$CP" "$F2" $DEST;
+        "$CP" "$F1" "$DEST";
+        "$CP" "$F2" "$DEST";
     else
         echo "Aborting. Nothing done.">&2;
         exit 1;
