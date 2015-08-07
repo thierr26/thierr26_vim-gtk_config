@@ -3,10 +3,10 @@ configuration file that the author had to write to achieve a satisfactory
 configuration for gVim (actually vim.gtk, available in the Debian GNU/Linux
 package vim-gtk).
 
-This repository contains the following files:
-
 ==============================================================================
-.vimrc, the author's vimrc file.
+Precisely, the files in this repository are:
+
+.vimrc, the initialization commands for Vim.
 
         This file is heavily commented. I guess the most "interesting" part is
         the affectation of the backupdir and directory options (the
@@ -14,22 +14,29 @@ This repository contains the following files:
         respectively). The file creates and uses the directories ~/.vim/backup
         and ~/.vim/swap.
 
-==============================================================================
-.gtkrc-2.0, the author's configuration file for GTK.
+----------------------------------------------
+.gtkrc-2.0, the configuration file for GTK.
 
         Thanks to this file, there is no unpleasant white patch at the bottom
         of the gVim window when gVim is used with a window manager that does
         not respect the size hints (e.g. a tiling window manager).
 
-==============================================================================
+----------------------------------------------
 install_thierr26_vim-gtk_config, a shell script to install the files.
 
         This script copies .vimrc and .gtkrc-2.0 to the user's home directory
         or to the directory specified on the command line. Launch the script
-        with the --help option for a complete documentation.
+        with the --help option for a more detailed documentation.
 
-==============================================================================
+        Note that no backup of the overwritten files is done.
+
+----------------------------------------------
 README, the present file.
 
-==============================================================================
+----------------------------------------------
 LICENSE, the license file (Unlicense license).
+
+==============================================================================
+Author: Thierry Rascle (thierr26@free.fr)
+
+Licensed under the Unlicense license (see http://unlicense.org).
