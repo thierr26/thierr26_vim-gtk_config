@@ -115,6 +115,9 @@ endif
 " (https://github.com/kien/ctrlp.vim).
 let g:ctrlp_regexp = 1
 
+" Have Ctrl-P plugin scan hidden files and directories.
+let g:ctrlp_show_hidden = 1
+
 " Use single leader key instead of double leader key in the EasyMotion plugin
 " (https://github.com/Lokaltog/vim-easymotion).
 let g:EasyMotion_leader_key = '<Leader>'
