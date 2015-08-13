@@ -90,16 +90,24 @@ set foldmethod=manual
 " Invert foldenable when the user presses the space bar.
 nnoremap <space> zi
 
-" Use a specific font.
-set guifont=inconsolata\ 12
+" Use Inconsolata font if the system looks like a Debian system (dpkg program
+" available) and package fonts-inconsolata is installed.
+" On Windows, try to use Consolas font.
+if has("unix")
+            \ && system("which dpkg") != ""
+            \ && system("dpkg -l fonts-inconsolata|grep '^i'") =~# "^i"
+    set guifont=inconsolata\ 12
+elseif has("win32")
+    silent! set guifont=Consolas
+endif
 
 " Do auto-indentation.
 set autoindent
 
-" Apply a particular color scheme (the Moria color scheme, available at
+" Apply the Moria color scheme if installed, available at
 " http://www.vim.org/scripts/script.php?script_id=1464).
 set background=dark
-color moria
+silent! color moria
 
 " Make "," the "leader" key (instead of the backslash).
 let mapleader = ","
