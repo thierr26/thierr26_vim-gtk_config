@@ -90,8 +90,10 @@ set foldmethod=manual
 " Invert foldenable when the user presses the space bar.
 nnoremap <space> zi
 
-" On Windows, try to use Consolas font, On Unix / Linux, try to use
-" Inconsolata.
+" On Windows, try to use the Consolas font.
+" On Unix / Linux, try to use the Inconsolata font. On a Debian GNU/Linux
+" system, you can install it with the command:
+" apt-get install fonts-inconsolata
 if has("unix")
     silent! set guifont=inconsolata\ 12
 elseif has("win32")
@@ -102,7 +104,7 @@ endif
 set autoindent
 
 " Apply the Moria color scheme if installed, available at
-" http://www.vim.org/scripts/script.php?script_id=1464).
+" http://www.vim.org/scripts/script.php?script_id=1464
 set background=dark
 silent! color moria
 
