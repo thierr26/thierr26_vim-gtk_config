@@ -90,13 +90,10 @@ set foldmethod=manual
 " Invert foldenable when the user presses the space bar.
 nnoremap <space> zi
 
-" Use Inconsolata font if the system looks like a Debian system (dpkg program
-" available) and package fonts-inconsolata is installed.
-" On Windows, try to use Consolas font.
+" On Windows, try to use Consolas font, On Unix / Linux, try to use
+" Inconsolata.
 if has("unix")
-            \ && system("which dpkg") != ""
-            \ && system("dpkg -l fonts-inconsolata|grep '^i'") =~# "^i"
-    set guifont=inconsolata\ 12
+    silent! set guifont=inconsolata\ 12
 elseif has("win32")
     silent! set guifont=Consolas
 endif
