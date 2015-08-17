@@ -139,6 +139,8 @@ let g:bufExplorerShowRelativePath = 1
 
 let s:specific_settings_required = 0
 if s:specific_settings_required
+    set background=light
+    set ruler
     set backupcopy=yes
     set lines=57
 endif
