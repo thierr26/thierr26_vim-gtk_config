@@ -45,6 +45,9 @@ if CanWriteToDir(s:SwapDir)
     let &directory = s:SwapDir . "//" . "," . &directory
 endif
 
+" Disable double space insertion on join command.
+set nojoinspaces
+
 " Don't wrap lines.
 set nowrap
 
