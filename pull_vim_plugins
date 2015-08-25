@@ -1,0 +1,269 @@
+#!/bin/sh
+
+# -----------------------------------------------------------------------------
+
+# Prepends the argument with "FATAL ERROR: " and echoes it to standard error,
+# then terminates the script with exit status 1. If no argument or empty
+# argument given, echoes "FATAL_ERROR" to standard error then terminates the
+# script with exit status 1.
+#
+# ARGUMENT:
+# $1: Any string.
+fatal() {
+
+    FATAL_ERROR="FATAL ERROR";
+    if [ $# -gt 0 ] && [ -n "$1" ]; then
+        echo "$FATAL_ERROR: $1">&2;
+    else
+        echo "$FATAL_ERROR">&2;
+    fi;
+    echo "Use \"$SCRIPT_PATH --help\" for documentation">&2;
+
+    exit 1;
+}
+
+# -----------------------------------------------------------------------------
+
+# Echoes the first argument being an executable command. Echoes nothing if none
+# of the arguments is an executable command.
+#
+# ARGUMENTS:
+# Any strings.
+echo_cmd() {
+    until [ $# -eq 0 ] || command -v "$1"; do
+        shift;
+    done;
+}
+
+# -----------------------------------------------------------------------------
+
+# Echoes the first argument being an executable command and returns with exit
+# status 0. If none of the arguments is an executable command, then terminates
+# the script with a call to function fatal and thus exit status 1.
+#
+# ARGUMENTS:
+# Any strings.
+echo_cmd_fatal() {
+
+    until [ $# -eq 0 ] || command -v "$1"; do
+        LAST_CMD="$1";
+        shift;
+    done;
+
+    if [ $# -eq 0 ]; then
+        if [ -n "$LAST_CMD" ]; then
+            fatal "$LAST_CMD does not seem to be installed.";
+        else
+            fatal;
+        fi;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# prints the documentation for the script to the standard output.
+#
+# ARGUMENT
+# $1: Script name.
+documentation() {
+
+    FMT="fmt";
+    CMD=$(echo_cmd_fatal "$FMT" cat);
+    if [ ${CMD##*/} = "$FMT" ] && [ -n "$(echo_cmd tput)" ]; then
+        CMD="fmt --width=$(tput cols)";
+    fi;
+
+    local SCRIPT_NAME="$1";
+    $CMD <<EOF
+Usage:
+
+    $SCRIPT_NAME [-p|--pretend] [VIM_BUNDLE_DIR]
+EOF
+    $CMD <<EOF
+    $SCRIPT_NAME -l|--list [VIM_BUNDLE_DIR]
+EOF
+    $CMD <<EOF
+    $SCRIPT_NAME -h|--help
+
+Description:
+
+    $SCRIPT_NAME iterates over the directories found in ~/.vim/bundle and for
+    each of these directories that contain a .git subdirectory, runs:
+
+    git pull
+
+    Directories of ~/.vim/bundle that are symbolic links are ignored.
+
+    If a directory is given as argument to the script, then the iteration is
+    done in this directory instead of ~/.vim/bundle.
+
+Options:
+
+    -p, --pretend
+        Does not execute any "git pull" command, only prints the commands that
+        would be executed if no option were used.
+
+    -l, --list
+        Does not execute any "git pull" command, only lists the Vim plugin
+        found in the Vim bundle directory.
+
+    -h, --help
+        Display this documentation and exit.
+EOF
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument starts with "-". Returns 1 otherwise.
+#
+# ARGUMENT
+# $1: Any string.
+has_hyphen_leader() {
+    if [ -n "$1" ] && [ -z ${1%%-*} ]; then
+        return 0;
+    else
+        return 1;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument starts with "--". Returns 1 otherwise.
+#
+# ARGUMENT
+# $1: Any string.
+has_double_hyphen_leader() {
+    if [ -n "$1" ] && [ -z ${1%%--*} ]; then
+        return 0;
+    else
+        return 1;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Is supposed to be called with all the arguments to the current script.
+#
+# Affects the following variables:
+#   HELP_OPT:       true if the user has requested the printing of the script
+#                   documentation, false otherwise.
+#   LIST_OPT:       true if the user only wants a listing of the installed vim
+#                   plugin, false otherwise.
+#   PRETEND_OPT:    true if the user only wants to see the commands that would
+#                   be executed if no option were used, false otherwise.
+#   VIM_BUNDLE_DIR: Installation directory for the Vim plugins.
+#
+# An unrecognized option or an empty destination directory will cause the
+# script to terminate with a call to the fatal function and thus exit status 1.
+#
+# ARGUMENTS
+# All the arguments to the current script.
+process_args() {
+
+    HELP_OPT=false;
+    LIST_OPT=false;
+    PRETEND_OPT=false;
+    VIM_BUNDLE_DIR=$HOME/.vim/bundle;
+
+    # Process the options.
+    OPT_PROCESSED=false;
+    while ! $OPT_PROCESSED && [ $# -gt 0 ] && has_hyphen_leader "$1"; do
+
+        OPT_STRING=${1#?}; # If $1 is "-abc" then $OPT_STRING is "abc".
+                           # If $1 is "--force" then $OPT_STRING is "-force".
+
+        if has_double_hyphen_leader "$1"; then
+            N=1;
+        else
+            N=${#OPT_STRING};
+        fi;
+
+        for k in $(seq 1 $N); do
+            if [ $N -gt 1 ]; then
+                OPT=${OPT_STRING%${OPT_STRING#?}}; # If $OPT_STRING is "abc" at
+                                                   # the beginning of the loop,
+                                                   # then $OPT is "a",
+                                                   # then "b", then "c".
+            else
+                OPT="$OPT_STRING";
+            fi;
+
+            case "-$OPT" in
+                --) OPT_PROCESSED=true;;
+                -h|--help) HELP_OPT=true;;
+                -l|--list) LIST_OPT=true;;
+                -p|--pretend) PRETEND_OPT=true;;
+                *) fatal "Unrecognized option: -$OPT"
+            esac;
+
+            if [ $N -gt 1 ]; then
+                OPT_STRING=${OPT_STRING#?};
+            fi;
+        done;
+
+        shift;
+    done;
+
+    # Terminate if both --list (or -l) and --pretend (or -p) have been used.
+    $LIST_OPT && $PRETEND_OPT && fatal "Incompatible options.";
+
+    # Process the other arguments.
+    if [ $# -gt 0 ]; then
+        if [ -z "$1" ]; then
+            fatal "The Vim bundle directory must not be an empty string.";
+        else
+            VIM_BUNDLE_DIR=${1%/};
+        fi;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# The script will terminate if trying to use an uninitialized variable.
+set -o nounset
+
+# The script will terminate if any statement returns a non-true return value.
+set -o errexit
+
+# Get the path to the script.
+SCRIPT_PATH="$0";
+
+# Get the base name of the script.
+SCRIPT_BASE_NAME=$(basename "$SCRIPT_PATH");
+
+process_args "$@";
+
+if $HELP_OPT; then
+    documentation $SCRIPT_BASE_NAME;
+else
+
+    FIND=$(echo_cmd_fatal find);
+    GIT=$(echo_cmd_fatal git);
+
+    FIND_OPTS="-L $VIM_BUNDLE_DIR -mindepth 1 -maxdepth 1 -type d"
+    for PLUGIN_FULL_PATH in $($FIND $FIND_OPTS); do
+        PLUGIN=${PLUGIN_FULL_PATH##*/};
+        if [ -L "$PLUGIN_FULL_PATH" ]; then
+            $LIST_OPT && echo "$PLUGIN (symbolic link, would not be pulled)";
+        else
+            if [ -d "$PLUGIN_FULL_PATH/.git" ]; then
+                # Current plugin seems to be a git repository.
+
+                if $LIST_OPT; then
+                    echo "$PLUGIN";
+                elif $PRETEND_OPT; then
+                    echo "git -C $PLUGIN_FULL_PATH pull";
+                else
+                    git -C $PLUGIN_FULL_PATH pull;
+                fi;
+            else
+                # Current plugin does not seem to be a git repository.
+
+                if $LIST_OPT; then
+                    echo "$PLUGIN (not under Git control)";
+                fi;
+            fi;
+        fi;
+    done;
+
+fi;
