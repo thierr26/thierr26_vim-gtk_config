@@ -80,22 +80,37 @@ Usage:
     $SCRIPT_NAME [-p|--pretend] [VIM_BUNDLE_DIR]
 EOF
     $CMD <<EOF
-    $SCRIPT_NAME -l|--list [VIM_BUNDLE_DIR]
+    $SCRIPT_NAME -l|--list [-c|--clone-script] [VIM_BUNDLE_DIR]
 EOF
     $CMD <<EOF
     $SCRIPT_NAME -h|--help
 
 Description:
 
-    $SCRIPT_NAME iterates over the directories found in ~/.vim/bundle and for
-    each of these directories that contain a .git subdirectory, runs:
-
-    git pull
+    $SCRIPT_NAME iterates over the directories found in ~/.vim/bundle and runs
+    "git pull" for each of these directories that fulfill the following
+    conditions:
+    - Contains a .git subdirectory;
+    - The command "git config --get remote.origin.url" run in this directory
+      exits with exit status 0 (means that the directory contains a git
+      repository and that a remote called "origin" has been defined for this
+      repository).
 
     Directories of ~/.vim/bundle that are symbolic links are ignored.
 
     If a directory is given as argument to the script, then the iteration is
     done in this directory instead of ~/.vim/bundle.
+
+    The -p or --pretend option causes the script to not execute the "git pull"
+    command but to print it instead.
+
+    The -l or --list command causes the script to only list the directories (no
+    matter whether they contain a .git directory or not). Symbolic links are
+    indicated as such. If the -c or --clone-script option is used along with
+    the -l or --list option, then an executable shell script is generated in
+    the directory containing the present script. The generated script contains
+    the "git clone" commands that could be run to reinstall the directories. It
+    is named clone_vim_plugins.
 
 Options:
 
@@ -106,6 +121,10 @@ Options:
     -l, --list
         Does not execute any "git pull" command, only lists the Vim plugin
         found in the Vim bundle directory.
+
+    -c, --clone-script
+        When used along with -l or --list, generates a script that can run the
+        "git clone" commands necessary to reinstall the directories.
 
     -h, --help
         Display this documentation and exit.
@@ -149,6 +168,8 @@ has_double_hyphen_leader() {
 #                   documentation, false otherwise.
 #   LIST_OPT:       true if the user only wants a listing of the installed vim
 #                   plugin, false otherwise.
+#   CLONE_OPT:      true if LIST_OPT is true and the user wants to generate the
+#                   "git clone" commands script.
 #   PRETEND_OPT:    true if the user only wants to see the commands that would
 #                   be executed if no option were used, false otherwise.
 #   VIM_BUNDLE_DIR: Installation directory for the Vim plugins.
@@ -162,6 +183,7 @@ process_args() {
 
     HELP_OPT=false;
     LIST_OPT=false;
+    CLONE_OPT=false;
     PRETEND_OPT=false;
     VIM_BUNDLE_DIR=$HOME/.vim/bundle;
 
@@ -192,6 +214,7 @@ process_args() {
                 --) OPT_PROCESSED=true;;
                 -h|--help) HELP_OPT=true;;
                 -l|--list) LIST_OPT=true;;
+                -c|--clone-script) CLONE_OPT=true;;
                 -p|--pretend) PRETEND_OPT=true;;
                 *) fatal "Unrecognized option: -$OPT"
             esac;
@@ -204,8 +227,12 @@ process_args() {
         shift;
     done;
 
-    # Terminate if both --list (or -l) and --pretend (or -p) have been used.
-    $LIST_OPT && $PRETEND_OPT && fatal "Incompatible options.";
+    # Terminate if an invalid option set has been used.
+    INCOMP_OPT="Incompatible options."
+    $LIST_OPT && $PRETEND_OPT && fatal "$INCOMP_OPT";
+    $CLONE_OPT && $PRETEND_OPT && fatal "$INCOMP_OPT";
+    $CLONE_OPT && ! $LIST_OPT \
+        && fatal "Can't use --clone-script without --list.";
 
     # Process the other arguments.
     if [ $# -gt 0 ]; then
@@ -215,6 +242,93 @@ process_args() {
             VIM_BUNDLE_DIR=${1%/};
         fi;
     fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument is the name of a writable directory, otherwise
+# calls the fatal function and thus terminates the script with exit status 1.
+#
+# ARGUMENT
+# $1: A directory name.
+is_writable_dir() {
+    if ! [ -d "$1" ]; then
+        fatal "$1 is not a directory.";
+    elif ! [ -w "$1" ]; then
+        fatal "$1 is not a writable directory.";
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument is not the name of a directory, otherwise calls the
+# fatal function and thus terminates the script with exit status 1.
+#
+# ARGUMENT
+# $1: A directory name.
+is_not_a_dir() {
+    if [ -d "$1" ]; then
+        fatal "$1 already exists as a directory.";
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Returns 0 if the argument is not the name of a read only file or directory,
+# otherwise calls the fatal function and thus terminates the script with exit
+# status 1.
+#
+# ARGUMENT
+# $1: A file or directory name.
+is_not_read_only() {
+    if [ -f "$1" ]; then
+        if ! [ -w "$1" ]; then
+            fatal "$1 already exists as a read only file or directory.";
+        fi;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Uses the variable SCRIPT_PATH and echoes the name of the "git clone"
+# commands script to generate. If it does not seem possible to create or
+# overwrite this file, then calls the fatal function and thus terminates the
+# script with exit status 1.
+generated_script() {
+
+    SCRIPT_DIR=${SCRIPT_PATH%/*};
+    SCRIPT_NAME=clone_vim_plugins;
+
+    if is_writable_dir "$SCRIPT_DIR" \
+            && is_not_a_dir "$SCRIPT_DIR/$SCRIPT_NAME" \
+            && is_not_read_only "$SCRIPT_DIR/$SCRIPT_NAME"; then
+        echo $SCRIPT_DIR/$SCRIPT_NAME;
+    fi;
+}
+
+# -----------------------------------------------------------------------------
+
+# Uses the variables GENERATED_SCRIPT and VIM_BUNDLE_DIR and generates the
+# first lines of the "git clone" commands script.
+generate_script_top() {
+
+    CHMOD=$(echo_cmd_fatal chmod);
+
+    echo "#!/bin/sh">$GENERATED_SCRIPT;
+    echo>>$GENERATED_SCRIPT;
+
+    DEST_NO_HOME=${VIM_BUNDLE_DIR#$HOME};
+
+    if [ $DEST_NO_HOME = $VIM_BUNDLE_DIR ]; then
+        TILDE="";
+    else
+        TILDE='~';
+    fi;
+
+    echo cd $TILDE$DEST_NO_HOME>>$GENERATED_SCRIPT;
+    echo>>$GENERATED_SCRIPT;
+
+    $CHMOD +x $GENERATED_SCRIPT;
 }
 
 # -----------------------------------------------------------------------------
@@ -240,27 +354,59 @@ else
     FIND=$(echo_cmd_fatal find);
     GIT=$(echo_cmd_fatal git);
 
+    GENERATED_SCRIPT=$(generated_script);
+
+    FIRST=true;
+
     FIND_OPTS="-L $VIM_BUNDLE_DIR -mindepth 1 -maxdepth 1 -type d"
     for PLUGIN_FULL_PATH in $($FIND $FIND_OPTS); do
         PLUGIN=${PLUGIN_FULL_PATH##*/};
         if [ -L "$PLUGIN_FULL_PATH" ]; then
-            $LIST_OPT && echo "$PLUGIN (symbolic link, would not be pulled)";
+            $LIST_OPT && echo "$PLUGIN (symbolic link)";
         else
-            if [ -d "$PLUGIN_FULL_PATH/.git" ]; then
-                # Current plugin seems to be a git repository.
+
+            set +o errexit
+            URL=$(git -C $PLUGIN_FULL_PATH config --get remote.origin.url);
+            EXIT_CODE=$?;
+            set -o errexit
+
+            if [ $EXIT_CODE -eq 0 ]; then
+                # Current plugin seems to be a git repository with a "origin"
+                # remote.
 
                 if $LIST_OPT; then
                     echo "$PLUGIN";
+                    if $CLONE_OPT; then
+                        if $FIRST; then
+                            generate_script_top;
+                        fi;
+                        echo git clone "$URL">>$GENERATED_SCRIPT;
+                    fi;
                 elif $PRETEND_OPT; then
                     echo "git -C $PLUGIN_FULL_PATH pull";
                 else
+                    if ! $FIRST; then
+                        echo;
+                    fi;
+
+                    echo "Pulling from $URL";
+
+                    set +o errexit
                     git -C $PLUGIN_FULL_PATH pull;
+                    set -o errexit
                 fi;
+
+                FIRST=false;
             else
-                # Current plugin does not seem to be a git repository.
+                # Current plugin does not seem to be a git repository with a
+                # "origin" remote.
 
                 if $LIST_OPT; then
-                    echo "$PLUGIN (not under Git control)";
+                    if [ -d "$PLUGIN_FULL_PATH/.git" ]; then
+                        echo "$PLUGIN (no remote called \"origin\" defined)";
+                    else
+                        echo "$PLUGIN (not under Git control)";
+                    fi;
                 fi;
             fi;
         fi;
