@@ -90,11 +90,13 @@ Description:
     $SCRIPT_NAME iterates over the directories found in ~/.vim/bundle and runs
     "git pull" for each of these directories that fulfill the following
     conditions:
-    - Contains a .git subdirectory;
-    - The command "git config --get remote.origin.url" run in this directory
-      exits with exit status 0 (means that the directory contains a git
-      repository and that a remote called "origin" has been defined for this
-      repository).
+
+    1. Contains a .git subdirectory;
+
+    2. The command "git config --get remote.origin.url" run in this directory
+    exits with exit status 0 (means that the directory contains a git
+    repository and that a remote called "origin" has been defined for this
+    repository).
 
     Directories of ~/.vim/bundle that are symbolic links are ignored.
 
