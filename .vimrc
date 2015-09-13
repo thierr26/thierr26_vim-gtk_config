@@ -8,29 +8,39 @@ syntax enable
 " Activate file type plugins.
 filetype plugin indent on
 
-function CanWriteToDir(PathToDir)
+" -----------------------------------------------------------------------------
 
-    " Returns a truthy value if the argument PathToDir is the path to a
-    " writable directory. If the directory does not exist, then the function
-    " attempts to create it, with permission 0700 (rwx------: readable and
-    " writable only for the owner).
+" Returns a truthy value if the argument is the path to a writable directory.
+" If the directory does not exist, then the function attempts to create it,
+" with permission 0700 (rwx------: readable and writable only for the owner).
+"
+" Arguments:
+"
+" #1 - path_to_dir
+" Path to a directory.
+"
+" Return value:
+" Non-zero if the argument is the path to a writable directory, zero otherwise.
+function s:CanWriteToDir(path_to_dir)
 
-    let l:Ret = (filewritable(a:PathToDir) == 2)
+    let l:Ret = (filewritable(a:path_to_dir) == 2)
     if !l:Ret
         if exists("*mkdir")
-            silent! call mkdir(a:PathToDir, "p", 0700)
+            silent! call mkdir(a:path_to_dir, "p", 0700)
         endif
-        let l:Ret = (filewritable(a:PathToDir) == 2)
+        let l:Ret = (filewritable(a:path_to_dir) == 2)
     endif
     return l:Ret
 
 endfunction
 
+" -----------------------------------------------------------------------------
+
 " Get the path to the Vim home directory (~/.vim on Unix / Linux systems).
 let s:DotVimPath = split(&runtimepath,",")[0]
 
 let s:BackupDir = s:DotVimPath . "/backup"
-if CanWriteToDir(s:BackupDir)
+if s:CanWriteToDir(s:BackupDir)
     set backup
 
     " Write backup files preferably in "~/.vim/backup".
@@ -38,7 +48,7 @@ if CanWriteToDir(s:BackupDir)
 endif
 
 let s:SwapDir = s:DotVimPath . "/swap"
-if CanWriteToDir(s:SwapDir)
+if s:CanWriteToDir(s:SwapDir)
 
     " Write swap files preferably in "~/.vim/swap". The "//" causes Vim to name
     " the swap files based on the full path name of the edited files.
@@ -147,4 +157,3 @@ if s:specific_settings_required
     set backupcopy=yes
     set lines=57
 endif
-
