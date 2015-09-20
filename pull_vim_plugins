@@ -363,8 +363,10 @@ else
     FIND_OPTS="-L $VIM_BUNDLE_DIR -mindepth 1 -maxdepth 1 -type d"
     for PLUGIN_FULL_PATH in $($FIND $FIND_OPTS); do
         PLUGIN=${PLUGIN_FULL_PATH##*/};
-        if [ -L "$PLUGIN_FULL_PATH" ] && $LIST_OPT; then
-            echo "$PLUGIN (symbolic link)";
+        if [ -L "$PLUGIN_FULL_PATH" ]; then
+            if $LIST_OPT; then
+                echo "$PLUGIN (symbolic link)";
+            fi;
         else
 
             set +o errexit
