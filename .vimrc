@@ -124,6 +124,9 @@ silent! color moria
 " Make "," the "leader" key (instead of the backslash).
 let mapleader = ","
 
+" Map <Leader>a to the search of non ASCII characters.
+nnoremap <Leader>a /[^\x00-\x7F]<CR>
+
 if !has("win16") && !has("win32") && !has("win64") && !has("win32unix")
             \ && $LANG =~# "\.UTF-8$"
     " Make guides displayed by the plugin indentLine appear like
