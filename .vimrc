@@ -153,6 +153,9 @@ map <Leader>w <Plug>(easymotion-bd-w)
 " show relative paths by default.
 let g:bufExplorerShowRelativePath = 1
 
+" Make tcomment work with octave file type.
+call tcomment#DefineType('octave', '# %s')
+
 let s:specific_settings_required = 0
 if s:specific_settings_required
     set background=light
