@@ -119,6 +119,9 @@ endif
 " Do auto-indentation.
 set autoindent
 
+" Source .vimrc in the current directory.
+set exrc
+
 " Apply the Moria color scheme if installed, available at
 " http://www.vim.org/scripts/script.php?script_id=1464
 set background=dark
