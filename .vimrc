@@ -67,6 +67,9 @@ set hlsearch
 " Disable temporarily the search highlighting when the user presses Ctrl-H.
 nnoremap <C-H> :nohlsearch<CR>
 
+" Toggle spell checking when the user presses Ctrl-S.
+nnoremap <C-S> :set spell!<CR>
+
 " Do incremental search.
 set incsearch
 
