@@ -160,7 +160,7 @@ map <Leader>w <Plug>(easymotion-bd-w)
 let g:bufExplorerShowRelativePath = 1
 
 " Make tcomment work with octave file type.
-call tcomment#DefineType('octave', '# %s')
+call tcomment#type#Define('octave', '# %s')
 
 let s:specific_settings_required = 0
 if s:specific_settings_required
