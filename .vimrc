@@ -151,7 +151,7 @@ let g:ctrlp_show_hidden = 1
 let g:ctrlp_user_command = {
 \ 'types': {
     \ 1: ['default.gpr',
-        \ 'find %s -type f | grep -v "\/obj\/" | grep -v "\/\.git\/"'],
+        \ 'find %s -type f | grep -v "\/\(obj\)\|\(bin\)\|\(.git\)\/"'],
     \ 2: ['.git',
         \ 'find %s -type f | grep -v "\/\.git\/"'],
     \ },
