@@ -64,6 +64,10 @@ set nowrap
 " Highlight search.
 set hlsearch
 
+" Set showcmd option (makes the number of selected characters or lines appear
+" in visual mode).
+set showcmd
+
 " Disable temporarily the search highlighting when the user presses Ctrl-H.
 nnoremap <C-H> :nohlsearch<CR>
 
@@ -132,6 +136,10 @@ let mapleader = ","
 
 " Map <Leader>a to the search of non ASCII characters.
 nnoremap <Leader>a /[^\x00-\x7F]<CR>
+
+" Map <Leader>c to comments hidding and <Leader>C to comments showing.
+nnoremap <Leader>c :hi! link Comment Ignore<CR>
+nnoremap <Leader>C :hi! link Comment Comment<CR>
 
 if !has("win16") && !has("win32") && !has("win64") && !has("win32unix")
             \ && $LANG =~# "\.UTF-8$"
