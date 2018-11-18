@@ -160,7 +160,9 @@ let g:ctrlp_user_command = {
 \ 'types': {
     \ 1: ['default.gpr',
         \ 'find %s -type f | grep -v "\/\(obj\)\|\(bin\)\|\(.git\)\/"'],
-    \ 2: ['.git',
+    \ 2: ['build',
+        \ 'find %s -type f | grep -v "\/\(build\)\|\(.git\)\/"'],
+    \ 3: ['.git',
         \ 'find %s -type f | grep -v "\/\.git\/"'],
     \ },
 \ 'fallback': 'find %s -type f'}
