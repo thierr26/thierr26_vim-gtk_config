@@ -117,7 +117,7 @@ nnoremap <space> zi
 if has("unix")
     silent! set guifont=inconsolata\ 12
 elseif has("win32")
-    silent! set guifont=Consolas
+    silent! set guifont=Consolas:h10
 endif
 
 " Do auto-indentation.
