@@ -10,4 +10,5 @@ git clone https://github.com/docunext/closetag.vim.git
 git clone https://github.com/jlanzarotta/bufexplorer.git
 git clone https://github.com/easymotion/vim-easymotion.git
 git clone https://github.com/Yggdroot/indentLine.git
-git clone git://github.com/jvirtanen/vim-octave.git
+git clone https://github.com/jvirtanen/vim-octave.git
+git clone https://github.com/wolf-dog/sceaduhelm.vim.git

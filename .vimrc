@@ -126,10 +126,9 @@ set autoindent
 " Source .vimrc in the current directory.
 set exrc
 
-" Apply the Moria color scheme if installed, available at
-" http://www.vim.org/scripts/script.php?script_id=1464
-set background=dark
-silent! color moria
+" Apply the sceaduhelm color scheme if installed, available at
+" https://github.com/wolf-dog/sceaduhelm.vim
+silent! color sceaduhelm
 
 " Make "," the "leader" key (instead of the backslash).
 let mapleader = ","
@@ -185,6 +184,7 @@ call tcomment#type#Define('octave', '# %s')
 let s:specific_settings_required = 0
 if s:specific_settings_required
     set background=light
+    silent! color moria
     set ruler
     set backupcopy=yes
     set lines=57
