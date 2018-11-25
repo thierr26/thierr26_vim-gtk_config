@@ -128,6 +128,7 @@ set exrc
 
 " Apply the sceaduhelm color scheme if installed, available at
 " https://github.com/wolf-dog/sceaduhelm.vim
+set t_Co=256
 silent! color sceaduhelm
 
 " Make "," the "leader" key (instead of the backslash).
