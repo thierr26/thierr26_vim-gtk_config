@@ -55,6 +55,9 @@ if s:CanWriteToDir(s:SwapDir)
     let &directory = s:SwapDir . "//" . "," . &directory
 endif
 
+" Enable the use of the mouse.
+set mouse=a
+
 " Disable double space insertion on join command.
 set nojoinspaces
 
