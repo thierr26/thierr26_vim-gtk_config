@@ -129,10 +129,11 @@ set autoindent
 " Source .vimrc in the current directory.
 set exrc
 
-" Apply the sceaduhelm color scheme if installed, available at
-" https://github.com/wolf-dog/sceaduhelm.vim
+" Apply the Seoul256 color scheme if installed, available at
+" https://github.com/junegunn/seoul256.vim
 set t_Co=256
-silent! color sceaduhelm
+let g:seoul256_background = 233
+silent! color seoul256
 
 " Make "," the "leader" key (instead of the backslash).
 let mapleader = ","

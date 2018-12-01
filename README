@@ -14,8 +14,8 @@ Precisely, the files in this repository are:
         respectively). The file creates and uses the directories ~/.vim/backup
         and ~/.vim/swap.
 
-        Note also that the file attempts to apply the sceaduhelm color scheme.
-        You can get it from https://github.com/wolf-dog/sceaduhelm.vim.
+        Note also that the file attempts to apply the Seoul256 color scheme.
+        You can get it from https://github.com/junegunn/seoul256.vim.
 
 ----------------------------------------------
 .gtkrc-2.0, the configuration file for GTK.
