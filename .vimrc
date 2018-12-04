@@ -129,11 +129,11 @@ set autoindent
 " Source .vimrc in the current directory.
 set exrc
 
-" Apply the Seoul256 color scheme if installed, available at
-" https://github.com/junegunn/seoul256.vim
-set t_Co=256
-let g:seoul256_background = 233
-silent! color seoul256
+" Use base16 (see https://ddrscott.github.io/blog/2017/base16-shell).
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+endif
 
 " Make "," the "leader" key (instead of the backslash).
 let mapleader = ","
