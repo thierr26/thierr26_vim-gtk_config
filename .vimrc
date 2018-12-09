@@ -159,17 +159,19 @@ let g:ctrlp_regexp = 1
 " Have Ctrl-P plugin scan hidden files and directories.
 let g:ctrlp_show_hidden = 1
 
-" Have Ctrl-P use custom file scanning commands.
-let g:ctrlp_user_command = {
-\ 'types': {
-    \ 1: ['default.gpr',
-        \ 'find %s -type f | grep -v "\/\(obj\)\|\(bin\)\|\(.git\)\/"'],
-    \ 2: ['build',
-        \ 'find %s -type f | grep -v "\/\(build\)\|\(.git\)\/"'],
-    \ 3: ['.git',
-        \ 'find %s -type f | grep -v "\/\.git\/"'],
-    \ },
-\ 'fallback': 'find %s -type f'}
+if !has("win16") && !has("win32") && !has("win64")
+    " Have Ctrl-P use custom file scanning commands.
+    let g:ctrlp_user_command = {
+    \ 'types': {
+        \ 1: ['default.gpr',
+            \ 'find %s -type f | grep -v "\/\(obj\)\|\(bin\)\|\(.git\)\/"'],
+        \ 2: ['build',
+            \ 'find %s -type f | grep -v "\/\(build\)\|\(.git\)\/"'],
+        \ 3: ['.git',
+            \ 'find %s -type f | grep -v "\/\.git\/"'],
+        \ },
+    \ 'fallback': 'find %s -type f'}
+endif
 
 " Use single leader key instead of double leader key in the EasyMotion plugin
 " (https://github.com/Lokaltog/vim-easymotion).
