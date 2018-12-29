@@ -164,8 +164,8 @@ if !has("win16") && !has("win32") && !has("win64")
     let g:ctrlp_user_command = {
     \ 'types': {
         \ 1: ['default.gpr',
-            \ 'find %s -type f | '
-            \ . 'grep -v "\/\(obj\)\|\(bin\)\|\(lcov\)\|\(.git\)\/"'],
+            \ 'cd %s && find . -type f | grep -v "\.\/\(obj\)\|\(bin\)\|'
+            \ . '\(lcov\)\|\([^\/]*doc[^\/]*\)\|\(.git\)\/"'],
         \ 2: ['build',
             \ 'find %s -type f | grep -v "\/\(build\)\|\(.git\)\/"'],
         \ 3: ['.git',
